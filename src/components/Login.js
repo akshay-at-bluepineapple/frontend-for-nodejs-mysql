@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+
 import Axios from "axios";
 
 function Login() {
@@ -6,6 +8,13 @@ function Login() {
   const [emailvalidator, setEmailValidator] = useState(true);
   const [passvalidator, setPassValidator] = useState(true);
   const [password, setPassword] = useState("");
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    setEmailValidator(false);
+    setPassValidator(false);
+  }, []);
 
   const emailChangeHandler = (event) => {
     // console.log(event.target.value);
@@ -24,13 +33,18 @@ function Login() {
   const submitHandler = (event) => {
     event.preventDefault();
 
+    //sending to server for validation of the user and setting usertoken to local storage
     Axios.post("https://nodejs-mysql-rest-api.vercel.app/api/users/login", {
       email,
       password,
     }).then((res) => {
-      console.log(res.data);
+      if (res.data.sucess === 1) {
+        localStorage.setItem("token", res.data.token);
+        navigate("/dashboard");
+      }
     });
   };
+
   return (
     <section>
       <div className="px-4 py-12 mx-auto max-w-7xl sm:px-6 md:px-12 lg:px-24 lg:py-24">
